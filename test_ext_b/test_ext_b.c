@@ -16,7 +16,7 @@ zend_module_entry test_ext_b_module_entry = {
 #endif
     PHP_TEST_EXT_B_EXTNAME,
     test_ext_b_functions,
-    NULL,
+    PHP_MINIT(test_ext_b),
     NULL,
 	NULL,
     NULL,
@@ -31,13 +31,33 @@ zend_module_entry test_ext_b_module_entry = {
 ZEND_GET_MODULE(test_ext_b)
 #endif
 
+struct SAMPLE_EXT_API
+{
+	int (*sum)(int, int);
+	int code;
+};
+
+void my_callback(void *api_void, char *ext_name, uint version)
+{
+	struct SAMPLE_EXT_API *api = (struct SAMPLE_EXT_API *)api_void;
+
+	php_printf("API Callback - %s - %d\n", ext_name, version);
+
+	php_printf("\tsum(100, 100) = %d\n", api->sum(100, 100));
+	php_printf("\tsum(1<<30, 1<<30) = %d\n", api->sum(1<<30, 1<<30));
+	php_printf("\tcode = %d\n", api->code);
+}
+
+PHP_MINIT_FUNCTION(test_ext_b)
+{
+	php_printf("Setting callbacks ... \n");
+	zend_ext_api_set_callback("ext_api_test", "1.0.0.0", my_callback);
+	zend_ext_api_set_callback("ext_api_test", "1.1.0.0", my_callback);
+}
+
 PHP_FUNCTION(test_extension_api)
 {
-    struct SAMPLE_EXT_API
-	{
-		int (*sum)(int, int);
-		int code;
-	} *api_new = NULL, *api_old = NULL;
+    struct SAMPLE_EXT_API *api_new = NULL, *api_old = NULL;
 
 	uint version;
 	char *version_text;

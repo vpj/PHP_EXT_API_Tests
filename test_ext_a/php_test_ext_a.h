@@ -6,6 +6,7 @@
 
 PHP_MINIT_FUNCTION(test_ext_a);
 PHP_MSHUTDOWN_FUNCTION(test_ext_a);
+PHP_RINIT_FUNCTION(test_ext_a);
 
 extern zend_module_entry test_ext_a_module_entry;
 #define phpext_test_ext_a_ptr &test_ext_a_module_entry

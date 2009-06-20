@@ -17,7 +17,7 @@ zend_module_entry test_ext_a_module_entry = {
     test_ext_a_functions,
     PHP_MINIT(test_ext_a),
     PHP_MSHUTDOWN(test_ext_a),
-    NULL,
+    PHP_RINIT(test_ext_a),
     NULL,
     NULL,
 #if ZEND_MODULE_API_NO >= 20010901
@@ -55,6 +55,13 @@ int safe_sum(int x, int y)
 	}
 
 	return x + y;
+}
+
+PHP_RINIT_FUNCTION(test_ext_a)
+{
+	php_printf("RINIT test ext a\n");
+
+	return SUCCESS;
 }
 
 PHP_MINIT_FUNCTION(test_ext_a)
