@@ -7,6 +7,11 @@
 
 static function_entry test_ext_b_functions[] = {
     PHP_FE(test_extension_api, NULL)
+    PHP_FE(check_api, NULL)
+    PHP_FE(check_callback, NULL)
+    PHP_FE(check_version_to_text, NULL)
+    PHP_FE(check_version_to_int, NULL)
+    PHP_FE(check_latest_api, NULL)
     {NULL, NULL, NULL}
 };
 
@@ -31,33 +36,142 @@ zend_module_entry test_ext_b_module_entry = {
 ZEND_GET_MODULE(test_ext_b)
 #endif
 
-struct SAMPLE_EXT_API
+typedef struct _SAMPLE_EXT_API
 {
 	int (*sum)(int, int);
 	int code;
-};
+} SAMPLE_EXT_API;
+
+typedef struct _EXTENSION
+{
+	SAMPLE_EXT_API *api;
+	char *name;
+	uint version;
+} EXTENSION;
+
+EXTENSION callbacked[10];
+int n_callbacked = 0;
 
 void my_callback(void *api_void, char *ext_name, uint version)
 {
-	struct SAMPLE_EXT_API *api = (struct SAMPLE_EXT_API *)api_void;
-
-	php_printf("API Callback - %s - %d\n", ext_name, version);
-
-	php_printf("\tsum(100, 100) = %d\n", api->sum(100, 100));
-	php_printf("\tsum(1<<30, 1<<30) = %d\n", api->sum(1<<30, 1<<30));
-	php_printf("\tcode = %d\n", api->code);
+	callbacked[n_callbacked].api = (SAMPLE_EXT_API *)api_void;
+	callbacked[n_callbacked].name = ext_name;
+	callbacked[n_callbacked++].version = version;
 }
 
 PHP_MINIT_FUNCTION(test_ext_b)
 {
-	php_printf("Setting callbacks ... \n");
 	zend_ext_api_set_callback("ext_api_test", "1.0.0.0", my_callback);
+	zend_ext_api_set_callback("ext_api_test", "1.0.22.0", my_callback);
 	zend_ext_api_set_callback("ext_api_test", "1.1.0.0", my_callback);
+}
+
+PHP_FUNCTION(check_callback)
+{
+	int n;
+	int x, y;
+	SAMPLE_EXT_API *api;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lll", &n, &x, &y) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(n >= n_callbacked)
+	{
+		RETURN_STRING("Not available", 1);
+	}
+
+	RETURN_LONG(callbacked[n].api->sum(x, y));
+}
+
+PHP_FUNCTION(check_version_to_text)
+{
+	int vi;
+	char *vt;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &vi) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(zend_ext_api_version_toa(vi, &vt) == FAILURE)
+	{
+		RETURN_STRING("Cannot convert", 1);
+	}
+
+	RETURN_STRING(vt, 1);
+}
+
+
+PHP_FUNCTION(check_version_to_int)
+{
+	int vi;
+	char *vt;
+	int l;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &vt, &l) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(zend_ext_api_version_toi(vt, &vi) == FAILURE)
+	{
+		RETURN_STRING("Cannot convert", 1);
+	}
+
+	RETURN_LONG(vi);
+}
+
+PHP_FUNCTION(check_latest_api)
+{
+	char *name;
+	int name_len;
+	int version;
+	int x, y;
+	SAMPLE_EXT_API *api;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sll", &name, &name_len, &x, &y) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(zend_ext_api_get_latest_version(name, &version) == FAILURE)
+	{
+		RETURN_STRING("Not available", 1);
+	}
+
+	if(zend_ext_api_get_int_ver(name, version, (void **)&api) == FAILURE)
+	{
+		RETURN_STRING("ERROR!", 1);
+	}
+
+	RETURN_LONG(api->sum(x, y));
+}
+
+PHP_FUNCTION(check_api)
+{
+	char *name, *version;
+	int name_len, version_len;
+	int x, y;
+	SAMPLE_EXT_API *api;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ssll", &name, &name_len, &version, &version_len, &x, &y) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(zend_ext_api_get(name, version, (void **)&api) == FAILURE)
+	{
+		RETURN_STRING("Not available", 1);
+	}
+
+	RETURN_LONG(api->sum(x, y));
 }
 
 PHP_FUNCTION(test_extension_api)
 {
-    struct SAMPLE_EXT_API *api_new = NULL, *api_old = NULL;
+    SAMPLE_EXT_API *api_new = NULL, *api_old = NULL;
 
 	uint version;
 	char *version_text;

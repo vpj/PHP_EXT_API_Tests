@@ -41,7 +41,9 @@ int safe_sum(int x, int y)
 	{
 		if(INT_MAX - x < y)
 		{
+#ifdef TEST_DEBUG
 			php_printf("Overflow error!\n");
+#endif
 			return 0;
 		}
 	}
@@ -49,7 +51,9 @@ int safe_sum(int x, int y)
 	{
 		if(INT_MIN - x > y)
 		{
+#ifdef TEST_DEBUG
 			php_printf("Overflow error!\n");
+#endif
 			return 0;
 		}
 	}
@@ -59,7 +63,9 @@ int safe_sum(int x, int y)
 
 PHP_RINIT_FUNCTION(test_ext_a)
 {
+#ifdef TEST_DEBUG
 	php_printf("RINIT test ext a\n");
+#endif
 
 	return SUCCESS;
 }
@@ -76,7 +82,6 @@ PHP_MINIT_FUNCTION(test_ext_a)
 
     zend_ext_api_register("ext_api_test", "1.0.0.0", (void *)&ext_old, sizeof(ext_old));
     zend_ext_api_register("ext_api_test", "1.1.0.0", (void *)&ext_new, sizeof(ext_new));
-	php_printf("Registered...\n");
 
 	return SUCCESS;
 }
