@@ -7,6 +7,8 @@
 PHP_FUNCTION(test_extension_api);
 PHP_FUNCTION(check_api);
 PHP_FUNCTION(check_callback);
+PHP_FUNCTION(check_latest_callback);
+PHP_FUNCTION(check_empty_callback);
 PHP_FUNCTION(check_version_to_text);
 PHP_FUNCTION(check_version_to_int);
 PHP_FUNCTION(check_latest_api);

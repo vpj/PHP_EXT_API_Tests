@@ -9,6 +9,8 @@ static function_entry test_ext_b_functions[] = {
     PHP_FE(test_extension_api, NULL)
     PHP_FE(check_api, NULL)
     PHP_FE(check_callback, NULL)
+    PHP_FE(check_latest_callback, NULL)
+    PHP_FE(check_empty_callback, NULL)
     PHP_FE(check_version_to_text, NULL)
     PHP_FE(check_version_to_int, NULL)
     PHP_FE(check_latest_api, NULL)
@@ -51,6 +53,9 @@ typedef struct _EXTENSION
 
 EXTENSION callbacked[10];
 int n_callbacked = 0;
+EXTENSION latest[10];
+int n_latest = 0;
+int n_empty = 0;
 
 void my_callback(void *api_void, char *ext_name, uint version)
 {
@@ -59,11 +64,54 @@ void my_callback(void *api_void, char *ext_name, uint version)
 	callbacked[n_callbacked++].version = version;
 }
 
+void my_latest_callback(void *api_void, char *ext_name, uint version)
+{
+	latest[n_latest].api = (SAMPLE_EXT_API *)api_void;
+	latest[n_latest].name = ext_name;
+	latest[n_latest++].version = version;
+}
+
+void my_empty_callback()
+{
+	n_empty++;
+}
+
 PHP_MINIT_FUNCTION(test_ext_b)
 {
 	zend_ext_api_set_callback("ext_api_test", "1.0.0.0", my_callback);
 	zend_ext_api_set_callback("ext_api_test", "1.0.22.0", my_callback);
 	zend_ext_api_set_callback("ext_api_test", "1.1.0.0", my_callback);
+	
+	zend_ext_api_set_callback("ext_api_test", NULL, my_latest_callback);
+	zend_ext_api_set_callback("ext_api_tst", NULL, my_latest_callback);
+	
+	zend_ext_api_set_empty_callback(my_empty_callback);
+}
+
+PHP_FUNCTION(check_latest_callback)
+{
+	int n;
+	int x, y;
+	SAMPLE_EXT_API *api;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lll", &n, &x, &y) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(n >= n_latest)
+	{
+		RETURN_STRING("Not available", 1);
+	}
+
+	php_printf("Extension: %s - %u\n", latest[n].name, latest[n].version);
+
+	RETURN_LONG(latest[n].api->sum(x, y));
+}
+
+PHP_FUNCTION(check_empty_callback)
+{
+	RETURN_LONG(n_empty);
 }
 
 PHP_FUNCTION(check_callback)
@@ -81,6 +129,8 @@ PHP_FUNCTION(check_callback)
 	{
 		RETURN_STRING("Not available", 1);
 	}
+
+	php_printf("Extension: %s - %u\n", callbacked[n].name, callbacked[n].version);
 
 	RETURN_LONG(callbacked[n].api->sum(x, y));
 }
