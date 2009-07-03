@@ -6,24 +6,24 @@
 #include "php_test_ext_a.h"
 
 static function_entry test_ext_a_functions[] = {
-    {NULL, NULL, NULL}
+	{NULL, NULL, NULL}
 };
 
 zend_module_entry test_ext_a_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
-    STANDARD_MODULE_HEADER,
+	STANDARD_MODULE_HEADER,
 #endif
-    PHP_TEST_EXT_A_EXTNAME,
-    test_ext_a_functions,
-    PHP_MINIT(test_ext_a),
-    PHP_MSHUTDOWN(test_ext_a),
-    PHP_RINIT(test_ext_a),
-    NULL,
-    NULL,
+	PHP_TEST_EXT_A_EXTNAME,
+	test_ext_a_functions,
+	PHP_MINIT(test_ext_a),
+	PHP_MSHUTDOWN(test_ext_a),
+	PHP_RINIT(test_ext_a),
+	NULL,
+	NULL,
 #if ZEND_MODULE_API_NO >= 20010901
-    PHP_TEST_EXT_A_VERSION,
+	PHP_TEST_EXT_A_VERSION,
 #endif
-    STANDARD_MODULE_PROPERTIES
+	STANDARD_MODULE_PROPERTIES
 };
 
 #ifdef COMPILE_DL_TEST_EXT_A
@@ -72,7 +72,7 @@ PHP_RINIT_FUNCTION(test_ext_a)
 
 PHP_MINIT_FUNCTION(test_ext_a)
 {
-    SAMPLE_EXT_API ext_old, ext_new;
+	SAMPLE_EXT_API ext_old, ext_new;
 	
 	ext_old.sum = sum;
 	ext_old.code = 9876;
@@ -80,8 +80,8 @@ PHP_MINIT_FUNCTION(test_ext_a)
 	ext_new.sum = safe_sum;
 	ext_new.code = 1234;
 
-    zend_ext_api_register("ext_api_test", "1.0.0.0", (void *)&ext_old, sizeof(ext_old));
-    zend_ext_api_register("ext_api_test", "1.1.0.0", (void *)&ext_new, sizeof(ext_new));
+	zend_eapi_register("eapi_test", "1.0.0.0", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test", "1.1.0.0", (void *)&ext_new, sizeof(ext_new));
 
 	return SUCCESS;
 }

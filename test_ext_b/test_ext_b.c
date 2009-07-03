@@ -6,32 +6,32 @@
 #include "php_test_ext_b.h"
 
 static function_entry test_ext_b_functions[] = {
-    PHP_FE(test_extension_api, NULL)
-    PHP_FE(check_api, NULL)
-    PHP_FE(check_callback, NULL)
-    PHP_FE(check_latest_callback, NULL)
-    PHP_FE(check_empty_callback, NULL)
-    PHP_FE(check_version_to_text, NULL)
-    PHP_FE(check_version_to_int, NULL)
-    PHP_FE(check_latest_api, NULL)
-    {NULL, NULL, NULL}
+	PHP_FE(test_extension_api, NULL)
+	PHP_FE(check_api, NULL)
+	PHP_FE(check_callback, NULL)
+	PHP_FE(check_latest_callback, NULL)
+	PHP_FE(check_empty_callback, NULL)
+	PHP_FE(check_version_to_text, NULL)
+	PHP_FE(check_version_to_int, NULL)
+	PHP_FE(check_latest_api, NULL)
+	{NULL, NULL, NULL}
 };
 
 zend_module_entry test_ext_b_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
-    STANDARD_MODULE_HEADER,
+	STANDARD_MODULE_HEADER,
 #endif
-    PHP_TEST_EXT_B_EXTNAME,
-    test_ext_b_functions,
-    PHP_MINIT(test_ext_b),
-    NULL,
+	PHP_TEST_EXT_B_EXTNAME,
+	test_ext_b_functions,
+	PHP_MINIT(test_ext_b),
 	NULL,
-    NULL,
-    NULL,
+	NULL,
+	NULL,
+	NULL,
 #if ZEND_MODULE_API_NO >= 20010901
-    PHP_TEST_EXT_B_VERSION,
+	PHP_TEST_EXT_B_VERSION,
 #endif
-    STANDARD_MODULE_PROPERTIES
+	STANDARD_MODULE_PROPERTIES
 };
 
 #ifdef COMPILE_DL_TEST_EXT_B
@@ -78,14 +78,14 @@ void my_empty_callback()
 
 PHP_MINIT_FUNCTION(test_ext_b)
 {
-	zend_ext_api_set_callback("ext_api_test", "1.0.0.0", my_callback);
-	zend_ext_api_set_callback("ext_api_test", "1.0.22.0", my_callback);
-	zend_ext_api_set_callback("ext_api_test", "1.1.0.0", my_callback);
+	zend_eapi_set_callback("eapi_test", "1.0.0.0", my_callback);
+	zend_eapi_set_callback("eapi_test", "1.0.22.0", my_callback);
+	zend_eapi_set_callback("eapi_test", "1.1.0.0", my_callback);
 	
-	zend_ext_api_set_callback("ext_api_test", NULL, my_latest_callback);
-	zend_ext_api_set_callback("ext_api_tst", NULL, my_latest_callback);
+	zend_eapi_set_callback("eapi_test", NULL, my_latest_callback);
+	zend_eapi_set_callback("eapi_tst", NULL, my_latest_callback);
 	
-	zend_ext_api_set_empty_callback(my_empty_callback);
+	zend_eapi_set_empty_callback(my_empty_callback);
 }
 
 PHP_FUNCTION(check_latest_callback)
@@ -145,7 +145,7 @@ PHP_FUNCTION(check_version_to_text)
 		RETURN_NULL();
 	} 
 
-	if(zend_ext_api_version_toa(vi, &vt) == FAILURE)
+	if(zend_eapi_version_toa(vi, &vt) == FAILURE)
 	{
 		RETURN_STRING("Cannot convert", 1);
 	}
@@ -165,7 +165,7 @@ PHP_FUNCTION(check_version_to_int)
 		RETURN_NULL();
 	} 
 
-	if(zend_ext_api_version_toi(vt, &vi) == FAILURE)
+	if(zend_eapi_version_toi(vt, &vi) == FAILURE)
 	{
 		RETURN_STRING("Cannot convert", 1);
 	}
@@ -186,12 +186,12 @@ PHP_FUNCTION(check_latest_api)
 		RETURN_NULL();
 	} 
 
-	if(zend_ext_api_get_latest_version(name, &version) == FAILURE)
+	if(zend_eapi_get_latest_version(name, &version) == FAILURE)
 	{
 		RETURN_STRING("Not available", 1);
 	}
 
-	if(zend_ext_api_get_int_ver(name, version, (void **)&api) == FAILURE)
+	if(zend_eapi_get_int_ver(name, version, (void **)&api) == FAILURE)
 	{
 		RETURN_STRING("ERROR!", 1);
 	}
@@ -211,7 +211,7 @@ PHP_FUNCTION(check_api)
 		RETURN_NULL();
 	} 
 
-	if(zend_ext_api_get(name, version, (void **)&api) == FAILURE)
+	if(zend_eapi_get(name, version, (void **)&api) == FAILURE)
 	{
 		RETURN_STRING("Not available", 1);
 	}
@@ -221,16 +221,16 @@ PHP_FUNCTION(check_api)
 
 PHP_FUNCTION(test_extension_api)
 {
-    SAMPLE_EXT_API *api_new = NULL, *api_old = NULL;
+	SAMPLE_EXT_API *api_new = NULL, *api_old = NULL;
 
 	uint version;
 	char *version_text;
 	
-	php_printf("Exists 1.0.0.0: %d\n", zend_ext_api_exists("ext_api_test", "1.0.0.0"));
-	php_printf("Exists 1.1.0.0: %d\n", zend_ext_api_exists("ext_api_test", "1.1.0.0"));
-    
+	php_printf("Exists 1.0.0.0: %d\n", zend_eapi_exists("eapi_test", "1.0.0.0"));
+	php_printf("Exists 1.1.0.0: %d\n", zend_eapi_exists("eapi_test", "1.1.0.0"));
+	
 	php_printf("Getting old api...\n");
-	if(zend_ext_api_get("ext_api_test", "1.0.0.0", (void **)&api_old) == SUCCESS)
+	if(zend_eapi_get("eapi_test", "1.0.0.0", (void **)&api_old) == SUCCESS)
 	{
 		php_printf("\tsum(100, 100) = %d\n", api_old->sum(100, 100));
 		php_printf("\tsum(1<<30, 1<<30) = %d\n", api_old->sum(1<<30, 1<<30));
@@ -242,7 +242,7 @@ PHP_FUNCTION(test_extension_api)
 	}
 
 	php_printf("Getting new api...\n");
-	if(zend_ext_api_get("ext_api_test", "1.1.0.0", (void **)&api_new) == SUCCESS)
+	if(zend_eapi_get("eapi_test", "1.1.0.0", (void **)&api_new) == SUCCESS)
 	{
 		php_printf("\tsum(100, 100) = %d\n", api_new->sum(100, 100));
 		php_printf("\tsum(1<<30, 1<<30) = %d\n", api_new->sum(1<<30, 1<<30));
@@ -253,16 +253,16 @@ PHP_FUNCTION(test_extension_api)
 		php_printf("\tAPI get failed\n");
 	}
 
-	zend_ext_api_get_latest_version("ext_api_test", &version);
+	zend_eapi_get_latest_version("eapi_test", &version);
 
 	php_printf("API max version %x\n", version);
 
-	php_printf("Converting version to text... ", zend_ext_api_version_toa(version, &version_text));
+	php_printf("Converting version to text... ", zend_eapi_version_toa(version, &version_text));
 	php_printf("%s\n", version_text);
 
-	php_printf("Converting version 0x0510a00f to text... ", zend_ext_api_version_toa(0x0510a00f, &version_text));
+	php_printf("Converting version 0x0510a00f to text... ", zend_eapi_version_toa(0x0510a00f, &version_text));
 	php_printf("%s\n", version_text);
 	
-    RETURN_STRING("Tests completed", 1);
+	RETURN_STRING("Tests completed", 1);
 }
 

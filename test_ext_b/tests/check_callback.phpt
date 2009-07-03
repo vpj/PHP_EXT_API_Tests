@@ -15,18 +15,18 @@ var_dump(check_latest_callback(1, 100, 120));
 var_dump(check_empty_callback(1, 100, 120));
  ?>
 --EXPECT--
-Extension: ext_api_test - 16777216
+Extension: eapi_test - 16777216
 int(220)
-Extension: ext_api_test - 16777216
+Extension: eapi_test - 16777216
 int(-294967297)
-Extension: ext_api_test - 16842752
+Extension: eapi_test - 16842752
 int(220)
-Extension: ext_api_test - 16842752
+Extension: eapi_test - 16842752
 int(0)
 string(13) "Not available"
-Extension: ext_api_test - 16842752
+Extension: eapi_test - 16842752
 int(220)
-Extension: ext_api_test - 16842752
+Extension: eapi_test - 16842752
 int(0)
 string(13) "Not available"
 int(1)
