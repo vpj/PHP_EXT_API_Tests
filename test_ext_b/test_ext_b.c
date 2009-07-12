@@ -4,6 +4,7 @@
 
 #include "php.h"
 #include "php_test_ext_b.h"
+#include "zend_ext_api.h"
 
 static function_entry test_ext_b_functions[] = {
 	PHP_FE(test_extension_api, NULL)
@@ -57,27 +58,34 @@ EXTENSION latest[10];
 int n_latest = 0;
 int n_empty = 0;
 
-void my_callback(void *api_void, char *ext_name, uint version)
+/*void my_callback(void *api, char *ext_name, uint version)*/
+
+EAPI_CALLBACK_FUNCTION(my_callback)
 {
-	callbacked[n_callbacked].api = (SAMPLE_EXT_API *)api_void;
+	callbacked[n_callbacked].api = (SAMPLE_EXT_API *)api;
 	callbacked[n_callbacked].name = ext_name;
 	callbacked[n_callbacked++].version = version;
 }
 
-void my_latest_callback(void *api_void, char *ext_name, uint version)
+/*void my_latest_callback(void *api, char *ext_name, uint version)*/
+
+EAPI_CALLBACK_FUNCTION(my_latest_callback)
 {
-	latest[n_latest].api = (SAMPLE_EXT_API *)api_void;
+	latest[n_latest].api = (SAMPLE_EXT_API *)api;
 	latest[n_latest].name = ext_name;
 	latest[n_latest++].version = version;
 }
 
-void my_empty_callback()
+/*void my_empty_callback()*/
+
+EAPI_EMPTY_CALLBACK_FUNCTION(my_empty_callback)
 {
 	n_empty++;
 }
 
 PHP_MINIT_FUNCTION(test_ext_b)
 {
+/*
 	zend_eapi_set_callback("eapi_test", "1.0.0.0", my_callback);
 	zend_eapi_set_callback("eapi_test", "1.0.22.0", my_callback);
 	zend_eapi_set_callback("eapi_test", "1.1.0.0", my_callback);
@@ -86,6 +94,15 @@ PHP_MINIT_FUNCTION(test_ext_b)
 	zend_eapi_set_callback("eapi_tst", NULL, my_latest_callback);
 	
 	zend_eapi_set_empty_callback(my_empty_callback);
+*/
+	EAPI_SET_CALLBACK("eapi_test", "1.0.0.0", my_callback);
+	EAPI_SET_CALLBACK("eapi_test", "1.0.22.0", my_callback);
+	EAPI_SET_CALLBACK("eapi_test", "1.1.0.0", my_callback);
+	
+	EAPI_SET_CALLBACK("eapi_test", NULL, my_latest_callback);
+	EAPI_SET_CALLBACK("eapi_tst", NULL, my_latest_callback);
+
+	EAPI_SET_EMPTY_CALLBACK(my_empty_callback);
 }
 
 PHP_FUNCTION(check_latest_callback)
