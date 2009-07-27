@@ -15,6 +15,7 @@ static function_entry test_ext_b_functions[] = {
 	PHP_FE(check_version_to_text, NULL)
 	PHP_FE(check_version_to_int, NULL)
 	PHP_FE(check_latest_api, NULL)
+	PHP_FE(check_find_versions, NULL)
 	{NULL, NULL, NULL}
 };
 
@@ -214,6 +215,39 @@ PHP_FUNCTION(check_latest_api)
 	}
 
 	RETURN_LONG(api->sum(x, y));
+}
+
+PHP_FUNCTION(check_find_versions)
+{
+	char *name;
+	int name_len;
+	uint *version_list;
+	int i;
+	int size;
+	uint version, mask;
+	int buf_len = 20;
+
+	array_init(return_value);
+
+	version_list = emalloc(buf_len * sizeof(uint));
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sll", &name, &name_len, &version, &mask) == FAILURE)
+	{
+		RETURN_NULL();
+	} 
+
+	if(zend_eapi_find_versions(name, version, mask, version_list, &size, buf_len) == FAILURE)
+	{
+		RETURN_STRING("ERROR!", 1);
+	}
+
+	
+	for(i = 0; i < size; ++i)
+	{
+		add_next_index_long(return_value, *(version_list+i));
+	}
+
+	efree(version_list);
 }
 
 PHP_FUNCTION(check_api)

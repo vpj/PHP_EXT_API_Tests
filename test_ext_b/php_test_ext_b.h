@@ -12,6 +12,7 @@ PHP_FUNCTION(check_empty_callback);
 PHP_FUNCTION(check_version_to_text);
 PHP_FUNCTION(check_version_to_int);
 PHP_FUNCTION(check_latest_api);
+PHP_FUNCTION(check_find_versions);
 PHP_MINIT_FUNCTION(test_ext_b);
 
 extern zend_module_entry test_ext_b_module_entry;

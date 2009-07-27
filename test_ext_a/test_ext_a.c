@@ -82,7 +82,16 @@ PHP_MINIT_FUNCTION(test_ext_a)
 
 	zend_eapi_register("eapi_test", "1.0.0.0", (void *)&ext_old, sizeof(ext_old));
 	zend_eapi_register("eapi_test", "1.1.0.0", (void *)&ext_new, sizeof(ext_new));
-
+	
+	/* To test find_versions */
+	zend_eapi_register("eapi_test2", "1.0.0.1", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test2", "1.0.1.2", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test2", "1.0.2.3", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test2", "1.0.0.0", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test2", "2.0.1.1", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test2", "2.0.2.2", (void *)&ext_old, sizeof(ext_old));
+	zend_eapi_register("eapi_test2", "2.0.0.3", (void *)&ext_old, sizeof(ext_old));
+	
 	return SUCCESS;
 }
 
