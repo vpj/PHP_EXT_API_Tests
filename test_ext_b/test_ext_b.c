@@ -4,7 +4,6 @@
 
 #include "php.h"
 #include "php_test_ext_b.h"
-#include "zend_ext_api.h"
 
 static function_entry test_ext_b_functions[] = {
 	PHP_FE(test_extension_api, NULL)
@@ -46,6 +45,12 @@ typedef struct _SAMPLE_EXT_API
 	int code;
 } SAMPLE_EXT_API;
 
+typedef struct _SAMPLE_DL_EXT_API
+{
+	int (*mul)(int, int);
+	int code;
+} SAMPLE_DL_EXT_API;
+
 typedef struct _EXTENSION
 {
 	SAMPLE_EXT_API *api;
@@ -66,6 +71,11 @@ EAPI_CALLBACK_FUNCTION(my_callback)
 	callbacked[n_callbacked].api = (SAMPLE_EXT_API *)api;
 	callbacked[n_callbacked].name = ext_name;
 	callbacked[n_callbacked++].version = version;
+}
+
+EAPI_CALLBACK_FUNCTION(my_dl_callback)
+{
+	php_printf("dl callback\n");
 }
 
 /*void my_latest_callback(void *api, char *ext_name, uint version)*/
@@ -99,6 +109,8 @@ PHP_MINIT_FUNCTION(test_ext_b)
 	EAPI_SET_CALLBACK("eapi_test", "1.0.0.0", my_callback);
 	EAPI_SET_CALLBACK("eapi_test", "1.0.22.0", my_callback);
 	EAPI_SET_CALLBACK("eapi_test", "1.1.0.0", my_callback);
+	
+	EAPI_SET_CALLBACK("eapi_test_dl", "1.1.0.0", my_callback);
 	
 	EAPI_SET_CALLBACK("eapi_test", NULL, my_latest_callback);
 	EAPI_SET_CALLBACK("eapi_tst", NULL, my_latest_callback);
