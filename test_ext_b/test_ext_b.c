@@ -110,7 +110,8 @@ PHP_MINIT_FUNCTION(test_ext_b)
 	EAPI_SET_CALLBACK("eapi_test", "1.0.22.0", my_callback);
 	EAPI_SET_CALLBACK("eapi_test", "1.1.0.0", my_callback);
 	
-	EAPI_SET_CALLBACK("eapi_test_dl", "1.1.0.0", my_callback);
+	EAPI_SET_CALLBACK("eapi_test_dl", "1.1.0.0", my_dl_callback);
+	EAPI_SET_CALLBACK("eapi_test_dl2", "1.1.0.0", my_callback);
 	
 	EAPI_SET_CALLBACK("eapi_test", NULL, my_latest_callback);
 	EAPI_SET_CALLBACK("eapi_tst", NULL, my_latest_callback);
